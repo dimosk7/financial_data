@@ -42,9 +42,9 @@ for cnt in range(len(excel_sheets_names)):
   data = data.drop(rows_to_del)
 
 
-# rename rows
-# e.g if the month is March(3) or April(4) we consider that the financial statements correspond to Q1 results.
-# We work with quarterly statements, therefore we have four different report periods (Q1,Q2,Q3,Q4)
+  # rename rows
+  # e.g if the month is March(3) or April(4) we consider that the financial statements correspond to Q1 results.
+  # We work with quarterly statements, therefore we have four different reporting periods (Q1,Q2,Q3,Q4)
   col_names = []
   for i in data.columns :
     if str(i)[6] == "3" or str(i)[6] == "4" :
@@ -71,7 +71,6 @@ for cnt in range(len(excel_sheets_names)):
   data = data.transpose()
   #add column with company name
   data.insert(0, "Company", excel_sheets_names[cnt])
-
 
 
   # Duplicate columns refer to different items, so they should not be deleted
