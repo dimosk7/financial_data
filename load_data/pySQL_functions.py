@@ -1,3 +1,8 @@
+
+## This file contains functions that i wrote to :
+       # 1) create a MySQL table with same columns as dataframe's ---> create_table()
+       # 2) store the data of a pandas dataframe to a MySQL table --> insert_to_sql()
+
 import pandas as pd
 import numpy as np
 import mysql.connector
