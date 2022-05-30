@@ -33,11 +33,12 @@ mydb = mysql.connector.connect(
   auth_plugin = "mysql_native_password"
 )
 
+# iteration counter
 cnt_t = 0
 
 for file in glob.glob("us_data/*.xlsx") :
 
-  # creating a list with the names of all sheets in Excel file
+  # creating a list with the names of all sheets in an Excel file
   excel_sheets_names = load_workbook(file, read_only = True, keep_links=False).sheetnames
 
   # define rows that need to be deleted in every sheet
@@ -103,7 +104,8 @@ for file in glob.glob("us_data/*.xlsx") :
     #converting index to column and rename it
     data.reset_index(inplace = True)
     data.rename(columns = { "index" : "Report Date"}, inplace = True)
-
+    
+    #create a dateframe in first iteration 
     if cnt_t == 0 :
       final_data = pd.DataFrame(columns = data.columns)
     cnt_t = 1
@@ -113,8 +115,8 @@ for file in glob.glob("us_data/*.xlsx") :
 
 end = time.time()
 
-# create SQL table
-py_to_sql.create_table(final_data, "usa_comp", mydb)
+# create SQL table usimg
+pySQL_functions.create_table(final_data, "usa_comp", mydb)
 #insert values into SQL table
-py_to_sql.insert_to_sql(final_data, "usa_comp", mydb)
+pySQL_functions.insert_to_sql(final_data, "usa_comp", mydb)
 
