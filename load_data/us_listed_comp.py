@@ -120,3 +120,56 @@ pySQL_functions.create_table(final_data, "usa_comp", mydb)
 #insert values into SQL table
 pySQL_functions.insert_to_sql(final_data, "usa_comp", mydb)
 
+
+# create companies info table
+
+data = pd.read_excel("us_data_sample/us_listed_sample.xlsx", header = 2)
+data = data.rename(columns = lambda x : x.strip())
+data.drop(index = 0, inplace = True)
+data.drop(labels ="Description", axis = 1,inplace = True)
+
+pySQL_functions.create_table(data, "comp_info", mydb)
+pySQL_functions.insert_to_sql(data, "comp_info", mydb)
+
+
+# create table with daily stock prices from Marketstack
+
+data_vendor = "Marketstack"
+mycursor = mydb.cursor()
+query_create = "CREATE TABLE IF NOT EXISTS daily_prices( " \
+               "`Ticker` char(10), `Date` date, ` Adj_Close Price` decimal(15,3), `Close Price` decimal(15,3), " \
+               "`Split Factor` float, `Dividend` float, `Data Vendor` char(25))"
+mycursor.execute(query_create)
+mydb.commit()
+
+# load comp_info table from SQL database into a list (select only columns "Ticker" and "IPO Date")
+mycursor.execute("select `Ticker`, `IPO Date` from comp_info")
+data_sql = mycursor.fetchall()  
+
+# retrieve historical daily prices for every company that exists in table "comp_info"
+# API response can return up to 250 prices, therefore I need to send multiple API requests 
+# To collect all data, I divide the total time period into periods of 250 days
+
+for x in data_sql: 
+    end_date = datetime.now().date()
+    start_date = x[1]
+    if start_date < end_date - relativedelta(years = 25) : # collect data for 25 years (maximum).
+        start_date = end_date - relativedelta(years = 25)
+
+    tmp_date = start_date + timedelta(250) 
+    while tmp_date < end_date  :
+      diff = end_date - tmp_date
+      if diff.days < 250 :
+        tmp_date = end_date
+      query = {"symbols" : x[0], "sort" : "ASC", "date_from" : start_date,"date_to" : tmp_date ,"limit": 1000 }
+      url = "http://api.marketstack.com/v1/eod?access_key=****************"
+      api_response = requests.get(url, params = query)
+      response_json = json.loads(api_response.text)
+
+      for i in response_json["data"]:
+          query_ins = "INSERT INTO daily_prices VALUES (%s, %s, %s, %s, %s, %s, %s)"
+          val = (x[0], i["date"].split("T")[0], i["adj_close"], i["close"], i["split_factor"], i["dividend"], data_vendor)
+          mycursor.execute(query_ins, val)
+          mydb.commit()
+      start_date = start_date + timedelta(250)
+      tmp_date = tmp_date + timedelta(250)
