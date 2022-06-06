@@ -6,4 +6,4 @@ In the first stage of the project, we create three tables that can be used to de
 
 As we said , an IBKR trader can have multiple accounts. To every account corresponds a stock portofolio. In the second phase we create tables that keep track of the trades of different accounts. The table named ```accounts``` contains information for every existing account and the table named ```trades``` includes all the executed trades of these accounts. For the implementation of this phase, we need access to Interactive Brokers Client Portal Web API. To accomplish this task we use IBeam which provides a Docker image that makes it easy to use the above Web API.
 
-#currently working on how to automate update tables
+*currently working on how to automate update tables
