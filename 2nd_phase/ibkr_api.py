@@ -5,6 +5,15 @@ import pySQL_functions
 import mysql.connector
 from datetime import datetime
 
+# connect to MySQL database
+mydb = mysql.connector.connect(
+  host = "localhost",
+  user = "root",
+  password ="dimosk",
+  database = "stocks_sample",
+  auth_plugin = "mysql_native_password"
+)
+
 # API request to retrieve trades history
 response = requests.get("https://localhost:5000/v1/api/iserver/account/trades", verify = False)
 data = json.loads(response.content)
@@ -17,14 +26,6 @@ sql_data = pd_data[col]
 # trade_time should be converted to the appropriate format (from str to datetime)
 sql_data["trade_time"] = sql_data["trade_time"].apply( lambda x : datetime.strptime(x, "%Y%m%d-%H:%M:%S"))
 
-# connect to MySQL database
-mydb = mysql.connector.connect(
-  host = "localhost",
-  user = "root",
-  password ="dimosk",
-  database = "stocks_sample",
-  auth_plugin = "mysql_native_password"
-)
 
 # create table "trades"
 pySQL_functions.create_table(sql_data, "trades", mydb, time = True)
