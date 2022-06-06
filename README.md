@@ -1,4 +1,4 @@
-# trades_database
+# Stocks Database
 
 The purpose of this project is to design a useful database for an IBKR trader with multiple accounts. 
 
