@@ -87,8 +87,6 @@ for file in glob.glob("us_data/*.xlsx") :
     #add column with company name
     data.insert(0, "Ticker", excel_sheets_names[cnt])
 
-
-
     # Duplicate columns refer to different items, so they should not be deleted
     pos_gross = find_last_dup_pos("Gross Margin", list(data.columns))
     pos_net = find_last_dup_pos("Net Income", list(data.columns))
@@ -115,24 +113,24 @@ for file in glob.glob("us_data/*.xlsx") :
 
 end = time.time()
 
-# create SQL table usimg
+# create table "fin_stat"
+
 pySQL_functions.create_table(final_data, "usa_comp", mydb)
-#insert values into SQL table
 pySQL_functions.insert_to_sql(final_data, "usa_comp", mydb)
 
 
-# create companies info table
+# create table "comp_info"
 
 data = pd.read_excel("us_data_sample/us_listed_sample.xlsx", header = 2)
 data = data.rename(columns = lambda x : x.strip())
 data.drop(index = 0, inplace = True)
-data.drop(labels ="Description", axis = 1,inplace = True)
+data.drop(labels = "Description", axis = 1,inplace = True)
 
 pySQL_functions.create_table(data, "comp_info", mydb)
 pySQL_functions.insert_to_sql(data, "comp_info", mydb)
 
 
-# create table with daily stock prices from Marketstack
+# create table with daily stock prices from Marketstack, table "daily_prices"
 
 data_vendor = "Marketstack"
 mycursor = mydb.cursor()
