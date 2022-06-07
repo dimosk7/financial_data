@@ -21,9 +21,6 @@ def find_last_dup_pos(value, list):
   pos = len(list) - 1 - list.index(value)
   return pos
 
-
-start = time.time()
-
 # connect to MySQL
 mydb = mysql.connector.connect(
   host = "localhost",
@@ -35,6 +32,8 @@ mydb = mysql.connector.connect(
 
 # iteration counter
 cnt_t = 0
+
+dataframes_list = []
 
 for file in glob.glob("us_data/*.xlsx") :
 
@@ -103,15 +102,9 @@ for file in glob.glob("us_data/*.xlsx") :
     data.reset_index(inplace = True)
     data.rename(columns = { "index" : "Report Date"}, inplace = True)
     
-    #create a dateframe in first iteration 
-    if cnt_t == 0 :
-      final_data = pd.DataFrame(columns = data.columns)
-    cnt_t = 1
+    dataframes_list.append(data)
 
-    final_data = final_data.append(data, ignore_index = True)
-
-
-end = time.time()
+final_data = pd.concat(dataframes_list)
 
 # create table "fin_stat"
 
