@@ -10,7 +10,7 @@ from datetime import datetime
 import math
 
 
-def create_table(dataframe, table, database, time = False) :
+def create_table(dataframe, table, database, time = False, add_id = False) :
     dataframe = dataframe.copy(deep = True)
     for i in dataframe.loc[:, dataframe.dtypes == object].columns:
         dataframe.loc[:, i] = dataframe.loc[:, i].apply(lambda x: str(x) if not pd.isna(x) else "")
@@ -39,6 +39,8 @@ def create_table(dataframe, table, database, time = False) :
         cnt += 1
 
     names = ",".join(names)
+    if add_id == True :
+        names = "id int not null auto_increment primary key ," + names
 
     query = "CREATE TABLE IF NOT EXISTS {}({})".format(table, names)
     mycursor = database.cursor()
@@ -60,8 +62,9 @@ def insert_to_sql(dataframe, table, database) :
     st = st + ")"
 
     mycursor = database.cursor()
+    col = "`" + "`,`".join(list(dataframe.columns)) + "`"
     for x in range(len(dataframe)) :
-      sql = "INSERT INTO {} VALUES {}".format(table, st)
+      sql = "INSERT INTO {}({}) VALUES {}".format(table, col, st)
       t = []
       for j in tuple(dataframe.iloc[x, :]) :
         if isinstance(j, (int, float, np.int64, np.float64)) and np.isnan(j) :
