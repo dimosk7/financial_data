@@ -108,8 +108,8 @@ final_data = pd.concat(dataframes_list)
 
 # create table "fin_stat"
 
-pySQL_functions.create_table(final_data, "usa_comp", mydb)
-pySQL_functions.insert_to_sql(final_data, "usa_comp", mydb)
+pySQL_functions.create_table(final_data, "fin_stat", mydb, add_id = True)
+pySQL_functions.insert_to_sql(final_data, "fin_stat", mydb)
 
 
 # create table "comp_info"
