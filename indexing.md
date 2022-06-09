@@ -23,4 +23,4 @@ show profiles;
 
 Results shown on the image below 
 
-![Alt text](tables_samplesindexing.PNGraw=true Optional Title)
+![Alt text](/tables_samples/indexing.PNG?raw=true Optional Title)
