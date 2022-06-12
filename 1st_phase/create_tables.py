@@ -146,7 +146,7 @@ for x in data_sql:
     end_date = datetime.now().date()
     while True :
         query = {"symbols": x[0], "date_to": end_date, "limit": 1000}
-        url = "http://api.marketstack.com/v1/eod?access_key=**********("
+        url = "http://api.marketstack.com/v1/eod?access_key=**********"
         api_response = requests.get(url, params=query)
         response_json = json.loads(api_response.text)
         if api_response.status_code == 422 or not response_json["data"]:
