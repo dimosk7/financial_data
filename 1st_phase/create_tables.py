@@ -133,34 +133,31 @@ query_create = "CREATE TABLE IF NOT EXISTS daily_prices( " \
 mycursor.execute(query_create)
 mydb.commit()
 
-# load comp_info table from SQL database into a list (select only columns "Ticker" and "IPO Date")
-mycursor.execute("select `Ticker`, `IPO Date` from comp_info")
-data_sql = mycursor.fetchall()  
+# load comp_info table from SQL database into a list (select only column "Ticker")
+mycursor.execute("select `Ticker` from companies")
+data_sql = mycursor.fetchall()
 
 # retrieve historical daily prices for every company that exists in table "comp_info"
-# API response can return up to 250 prices, therefore I need to send multiple API requests 
-# To collect all data, I divide the total time period into periods of 250 days
+# API response can return up to 1000 prices, therefore for some companies I need to send multiple API requests 
 
-for x in data_sql: 
+data_vendor = "Marketstack"
+
+for x in data_sql:
     end_date = datetime.now().date()
-    start_date = x[1]
-    if start_date < end_date - relativedelta(years = 25) : # collect data for 25 years (maximum).
-        start_date = end_date - relativedelta(years = 25)
-
-    tmp_date = start_date + timedelta(250) 
-    while tmp_date < end_date  :
-      diff = end_date - tmp_date
-      if diff.days < 250 :
-        tmp_date = end_date
-      query = {"symbols" : x[0], "sort" : "ASC", "date_from" : start_date,"date_to" : tmp_date ,"limit": 1000 }
-      url = "http://api.marketstack.com/v1/eod?access_key=****************"
-      api_response = requests.get(url, params = query)
-      response_json = json.loads(api_response.text)
-
-      for i in response_json["data"]:
-          query_ins = "INSERT INTO daily_prices VALUES (%s, %s, %s, %s, %s, %s, %s)"
-          val = (x[0], i["date"].split("T")[0], i["adj_close"], i["close"], i["split_factor"], i["dividend"], data_vendor)
-          mycursor.execute(query_ins, val)
-          mydb.commit()
-      start_date = start_date + timedelta(250)
-      tmp_date = tmp_date + timedelta(250)
+    while True :
+        query = {"symbols": x[0], "date_to": end_date, "limit": 1000}
+        url = "http://api.marketstack.com/v1/eod?access_key=**********("
+        api_response = requests.get(url, params=query)
+        response_json = json.loads(api_response.text)
+        if api_response.status_code == 422 or not response_json["data"]:
+            break
+        else :
+            for i in response_json["data"]:
+                query_ins = "INSERT INTO daily_prices VALUES (DEFAULT,%s, %s, %s, %s, %s, %s, %s)"
+                val = (x[0], i["date"].split("T")[0], i["adj_close"], i["close"], i["split_factor"], i["dividend"], data_vendor)
+                mycursor.execute(query_ins, val)
+                mydb.commit()
+            end_date = datetime.strptime(response_json["data"][-1]["date"], "%Y-%m-%dT%H:%M:%S+%f") - timedelta(1)
+            if len(response_json["data"]) < 1000 :
+                break
+           
