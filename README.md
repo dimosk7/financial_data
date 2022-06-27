@@ -8,4 +8,6 @@ As we said , an IBKR trader can have multiple accounts. To every account corresp
 
 *currently working on how to automate update tables
 
+The entity relationship diagram is shown below :
+
 ![Alt text](/tables_samples/erd_stocks.PNG?raw=true "Optional Title")
