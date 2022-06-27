@@ -11,7 +11,7 @@ from fin_stat
 where Ticker = PBIP;
 
 CREATE INDEX index_f
-ON fin_stat(Ticker, id);
+ON fin_stat(Ticker);
 
 select  
 from fin_stat
@@ -21,6 +21,5 @@ show profiles;
 
 ~~~
 
-Results shown on the image below 
 
-![Alt text](/tables_samples/indexing.PNG?raw=true "Optional Title")
+
