@@ -108,7 +108,7 @@ final_data = pd.concat(dataframes_list)
 
 # create table "fin_stat"
 
-pySQL_functions.create_table(final_data, "fin_stat", mydb, add_id = True)
+pySQL_functions.create_table(final_data, "fin_stat", mydb)
 pySQL_functions.insert_to_sql(final_data, "fin_stat", mydb)
 
 
